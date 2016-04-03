@@ -2,7 +2,6 @@
 #include<string.h>
 #include<iostream>
 #define LEN 100000
-using namespace std;
 class kmpstring{
 public:
 	char s[LEN],p[LEN];
