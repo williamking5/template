@@ -1,5 +1,3 @@
-#include<iostream>
-using namespace std;
 //data默认为int类型，如果要进行修改，请定义新的类型，并重载比较运算符
 struct DATA{
     int x;
