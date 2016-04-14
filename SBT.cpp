@@ -190,7 +190,7 @@ public:
 	}
 	//查询比data小（严格）的数字有多少个
 	int Rank(int data){
-		return result=rank(root,data_class(-1,data));
+		return rank(root,data_class(-1,data));
 	}
 	//查找data是否存在
 	bool Find(int data){
