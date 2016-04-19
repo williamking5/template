@@ -58,6 +58,9 @@ public:
 		return 0;
 	}
 	int root;
+	SBT(){
+		root=0;
+	}
 	//如果要维护父亲节点和儿子节点的其他域值则修改adapt
 	void adapt(int x){
 		tree[x].size=tree[tree[x].left].size+tree[tree[x].right].size+1;
