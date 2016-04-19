@@ -1,38 +1,35 @@
-#include<iostream>
-#include<stdlib.h>
-#include<time.h>
-using namespace std;
+#include<bits/stdc++.h>
 struct DATA{
     int x;
     DATA(int t){x=t;}
     DATA(){}
+/*产生数学后继*/
+    DATA operator()(){
+        return DATA(x+1);
+    }
 };
+/* 下列比较函数只需要更改<即可 */
 bool operator <(const DATA &a,const DATA &b){
     return a.x<b.x;
 }
 bool operator == (const DATA &a,const DATA &b){
-    return a.x==b.x;
+    return !(a<b||b<a);
 }
 struct NODE{
     int size,HASH,left,right;
     int RANDOM;
     DATA data;
-};
-struct TREAP{
-    int top,root;
-    NODE* tree;
-    TREAP(int n){
-        top=root=0;
-        tree=new NODE[n+10];
-        for (int i=0;i<=n;i++){
-            tree[i].left=tree[i].right=0;
-            tree[i].size=1;
-        }
-        tree[0].size=0;
-        srand(time(NULL));
+    NODE(){
+        left=right=size=0;
     }
-    ~TREAP(){
-        delete tree;
+};
+int top;
+NODE tree[100000];
+struct TREAP{
+    int root;
+    TREAP(){
+        root=0;
+        srand(time(NULL));
     }
     void adapt(int x){
 		tree[x].size=tree[tree[x].left].size+tree[tree[x].right].size+1;
@@ -136,7 +133,7 @@ struct TREAP{
 	void Insert(DATA data){
         insert(0,root,data);
 	}
-	int Delete(DATA data){
+	int Remove(DATA data){
         return remove(root,root,data);
 	}
 	int rank(int &x,DATA data){
@@ -157,10 +154,28 @@ struct TREAP{
 	DATA Select(int k){
         return select(root,k);
 	}
-};
-TREAP a(100020);
+    bool Find(DATA data){
+		if (!root) return 0;
+		else {
+			int x=root;
+			while (!(tree[x].data==data)&&x){
+				if (tree[x].data<data) x=tree[x].right;
+				else x=tree[x].left;
+			}
+			if (!x) return 0;
+			else if (tree[x].data==data) return 1;
+		}
+	}
+	int Count(DATA data){
+		bool exi=Find(data);
+		if (exi){
+			int aaa=Rank(data);
+			int bbb=Rank(data());
+			return bbb-aaa;
+		}
+		else return 0;
+	}
+} a;
 int main(){
-    for (int i=1;i<=100000;i++)
-        a.Insert(i);
     return 0;
 }
