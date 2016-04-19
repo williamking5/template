@@ -1,22 +1,25 @@
-//data默认为int类型，如果要进行修改，请定义新的类型，并重载比较运算符
 struct DATA{
+/* 以int类型为例*/
     int x;
-    DATA (int t){
-        x=t;
-    }
+    DATA (int t){x=t;}
     DATA (){}
+/* 该函数的作用是产生数学后继，在统计元素数目(SBT::Count)的时候需要使用*/
+    DATA operator()(){
+        return x+1;
+    }
 };
+/* 下列比较函数中，只要更改<号即可，其他的不需要更改。*/
 bool operator < (const DATA a,const DATA b){
     return a.x<b.x;
 }
 bool operator > (const DATA a,const DATA b){
-    return a.x>b.x;
+    return b<a;
 }
 bool operator == (const DATA a,const DATA b){
-    return a.x==b.x;
+    return !(a<b||a>b);
 }
 bool operator != (const DATA a,const DATA b){
-    return a.x!=b.x;
+    return (a<b||a>b);
 }
 struct data_class{
     int HASH;
@@ -38,26 +41,23 @@ bool operator == (const data_class a,const data_class b){
 bool operator >= (const data_class a,const data_class b){
     return a>b||a==b;
 }
+struct sbt{
+    int left,right,size;
+    data_class data;
+    sbt(){
+        left=right=size=0;
+    }
+};
+sbt tree[300000];
+int top;
 struct SBT{
 public:
-	struct sbt
-	{
-		int left,right,size;
-		data_class data;
-	};
 	int datacmp(const data_class a,const data_class b){
 		if (a.data<b.data) return 1;
 		if (a.data>b.data) return -1;
 		return 0;
 	}
-	int top,root;
-	sbt* tree;
-	SBT(int n){
-		top=root=0;
-		tree=new sbt[n+10];
-		for (int i=0;i<n+10;i++)
-            tree[i].left=tree[i].right=tree[i].size=0;
-	}
+	int root;
 	//如果要维护父亲节点和儿子节点的其他域值则修改adapt
 	void adapt(int x){
 		tree[x].size=tree[tree[x].left].size+tree[tree[x].right].size+1;
@@ -116,6 +116,7 @@ public:
 			Maintain(x,data>=tree[x].data);
 		}
 	}
+	/*注意，这个remove是危险的，在删除之前必须使用Find检查元素的存在性*/
 	int remove(int fa,int &x,data_class data){
 		if (!x) return 0;
 		tree[x].size--;
@@ -177,11 +178,11 @@ public:
 		return tree[x].data;
 	}
 	//插入一个数
-	void Insert(int data){
+	void Insert(DATA data){
 		insert(root,data_class(top+1,data));
 	}
 	//删除一个数，在相同的情况下，任意删除其中一个
-	void Remove(int data){
+	void Remove(DATA data){
 		remove(0,root,data_class(0,data));
 	}
 	//查询第k小的数字
@@ -189,11 +190,11 @@ public:
 		return select(root,k).data;
 	}
 	//查询比data小（严格）的数字有多少个
-	int Rank(int data){
+	int Rank(DATA data){
 		return rank(root,data_class(-1,data));
 	}
 	//查找data是否存在
-	bool Find(int data){
+	bool Find(DATA data){
 		if (!root) return 0;
 		else {
 			int x=root;
@@ -206,11 +207,11 @@ public:
 		}
 	}
 	//统计data一共有多少个
-	int Count(int data){
+	int Count(DATA data){
 		bool exi=Find(data);
 		if (exi){
 			int aaa=Rank(data);
-			int bbb=Rank(data+1);
+			int bbb=Rank(data());
 			return bbb-aaa;
 		}
 		else return 0;
@@ -224,8 +225,7 @@ public:
 		return getmin().data;
 	}
 };
-//声明一个具有100个节点的平衡树
-SBT a(100);
+SBT a;
 int main(){
     a.Insert(1);
     a.Insert(4);
@@ -236,6 +236,6 @@ int main(){
     a.Insert(1);
     a.Insert(1);
     //删除所有的4
-    while (a.Count(4))
+    while (a.Find(4))
         a.Remove(4);
 }
