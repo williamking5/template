@@ -1,0 +1,64 @@
+#include<bits/stdc++.h>
+#define _(x) (tree[x].left+tree[x].right)/2
+#define A(x) ((2<<x)-2)
+#define L(x) tree[x].lazy
+#define S(x) tree[x].sum
+#define LEFT(x) tree[x].left
+#define RIGHT(x) tree[x].right
+#define LENGTH(x) (tree[x].right-tree[x].left+1)
+#define LC(i) i*2+1
+#define RC(i) i*2+2
+using namespace std;
+struct INTERVAL_DATA{
+    int left,right;
+    int data,lazy,sum,Min;
+    INTERVAL_DATA(){
+        data=lazy=left=right=0;
+    }
+};
+struct INTERVAL_TREE{
+    int n;
+    INTERVAL_DATA *tree;
+    INTERVAL_TREE(int height){
+        tree=new INTERVAL_DATA[2<<height];
+        n=height;
+
+        int h=0;
+        LEFT(0)=0;RIGHT(0)=(1<<n)-1;
+        for (int i=0;i<((1<<n)-1);i++){
+            if (i>(2<<h)-2) h++;
+            LEFT(LC(i))=LEFT(i);
+            LEFT(RC(i))=(1<<(n-h-1))|LEFT(i);
+            RIGHT(LC(i))=LEFT(LC(i))+(1<<(n-h-1))-1;
+            RIGHT(RC(i))=LEFT(RC(i))+(1<<(n-h-1))-1;
+        }
+        for (int i=0;i<=A(n);i++) {
+            LEFT(i)++;RIGHT(i)++;
+        }
+    }
+    void downdate(int root){
+        if (L(root)) {
+            S(root)+=L(root)*LENGTH(root);
+            if (RC(root)<=A(n)) {
+                L(LC(root))+=L(root);
+                L(RC(root))+=L(root);
+            }
+            L(root)=0;
+        }
+    }
+    int add(int root,int I,int J,int x){
+        downdate(root);
+        int mid=_(root);
+        if (I==LEFT(root)&&J==RIGHT(root)) return (L(root)+=x)&&1;
+        S(root)+=(J-I+1)*x;
+        if (I>mid) return add(RC(root),I,J,x);
+        if (J<=mid) return add(LC(root),I,J,x);
+        return add(LC(root),I,mid,x)&&add(RC(root),mid+1,J,x);
+    }
+} a(4);
+/*线段长度为2^4=16个*/
+int main(){
+    for (int i=1;i<=9;i++)
+        a.add(0,i,i,i);
+    return 0;
+}
