@@ -1,36 +1,32 @@
-#include<iostream>
-#include<stdio.h>
-#include<string.h>
-#define P1 100007
-#define P2 972997
+#include<bits/stdc++.h>
 using namespace std;
-int i,j,n,ther;
-int s[100],len,b[100],total,st[100],top;
-long long cal(long long a,long long b,long long c,long long p){
+long long s[10000],b[10000],st[10000],top;
+char S[10000];
+long long cal(long long a,long long b,long long c){
 	long long result;
 	if (c==-3){
 		result=1;
 		for (int i=1;i<=b;i++){
-			result=result*a%p;
-			if (result<0) result+=p;
+			result=result*a;
 		}
 	}
 	else if (c==-4) {
-		result=a*b%p;
-		if (result<0) result+=p;
+		result=a*b;
 	}
 	else if (c==-5) {
-		result=(a+b)%p;
-		if (result<0) result+=p;
+		result=(a+b);
 	}
 	else if (c==-6) {
-		result=(a-b+p)%p;
-		if (result<0) result+=p;
+		result=(a-b);
 	}
 	return result;
 }
-int getans(const char *tmp,int n,int a){
-	int len=0,i=0,total=0,top=-1;
+long long getans(const char *tmp){
+	long long len=0,i=0,total=0,top=-1;
+    long long n=strlen(tmp);
+    memset(s,0,sizeof s);
+    memset(b,0,sizeof b);
+    memset(st,0,sizeof st);
 
 	while (i<n){
 		if (tmp[i]==' '){
@@ -43,9 +39,8 @@ int getans(const char *tmp,int n,int a){
 		else if (tmp[i]=='^') s[len++]=-3;
 		else if (tmp[i]=='(') s[len++]=-2;
 		else if (tmp[i]==')') s[len++]=-1;
-		else if (tmp[i]=='a') s[len++]=a;
 		else {
-			int ans=0;
+			long long ans=0;
 			while (tmp[i]>='0'&&tmp[i]<='9'){
 				ans=ans*10+tmp[i]-'0';
 				i++;
@@ -110,39 +105,13 @@ int getans(const char *tmp,int n,int a){
 	for (int i=0;i<total;i++){
 		if (b[i]>0) st[++top]=b[i];
 		else {
-			int re=cal(st[top-1],st[top],b[i],P1);
+			long long re=cal(st[top-1],st[top],b[i]);
 			st[--top]=re;
 		}
 	}
 	return st[0];
 }
-char stds[100],option[30][100];
-int v[30];
 int main(){
-	fgets(stds,100,stdin);
-	stds[strlen(stds)-1]=0;
-
-	scanf("%d",&n);
-	char tm[100];
-	fgets(tm,100,stdin);
-	for (i=0;i<n;i++){
-		fgets(option[i],100,stdin);
-		option[i][strlen(option[i])-1]=0;
-	}
-
-	int checknum[100]={17,97},ansnum[30],stdnum;
-	
-	for (int i=0;i<2;i++){
-		stdnum=getans(stds,strlen(stds),checknum[i]);
-		
-		for (int j=0;j<n;j++){
-			int kk=getans(option[j],strlen(option[j]),checknum[i]);
-			if (kk!=stdnum) v[j]=1;
-		}
-	}
-
-	for (int i=0;i<n;i++)
-		if (!v[i]) printf("%c",i+'A');
-	cout<<endl;
-	return 0;
+    cout<<getans("56*9");
+    return 0;
 }
