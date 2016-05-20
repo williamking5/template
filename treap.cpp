@@ -154,7 +154,7 @@ struct TREAP{
 	DATA Select(int k){
         return select(root,k);
 	}
-    bool Find(DATA data){
+    int Find(DATA data){
 		if (!root) return 0;
 		else {
 			int x=root;
@@ -163,7 +163,7 @@ struct TREAP{
 				else x=tree[x].left;
 			}
 			if (!x) return 0;
-			else if (tree[x].data==data) return 1;
+			else if (tree[x].data==data) return x;
 		}
 	}
 	int Count(DATA data){
