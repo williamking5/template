@@ -33,6 +33,7 @@ void change(Complex y[],int len){
         if(j < k) j += k;
     }
 }
+//将系数向量y转换成点阵，对应的x向量是由n个不同的n次单位根构成的
 void fft(Complex y[],int len,int on){
 	change(y,len);
 	for (int h=2;h<=len;h<<=1){
@@ -48,6 +49,7 @@ void fft(Complex y[],int len,int on){
 			}
 		}
 	}
+	//如果on=-1则表示逆FFT
 	if (on==-1)
 		for (int i=0;i<len;i++)
 			y[i].x/=len;
@@ -71,13 +73,13 @@ int main(){
             x2[i] = Complex(str2[len2-1-i]-'0',0);
         for(int i = len2;i < len;i++)
             x2[i] = Complex(0,0);
-
+//将两个系数向量进行FFT
 		fft(x1,len,1);
 		fft(x2,len,1);
-
+//点乘
         for(int i = 0;i < len;i++)
             x1[i] = x1[i]*x2[i];
-
+//将点向量转换成系数向量
         fft(x1,len,-1);
 		for (int i=0;i<len;i++)
 			sum[i]=(int) (x1[i].x+0.5);
