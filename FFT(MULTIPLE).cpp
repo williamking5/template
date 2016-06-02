@@ -62,6 +62,7 @@ int main(){
 	while (scanf("%s%s",str1,str2)==2){
 		int len1=strlen(str1);
 		int len2=strlen(str2);
+//注意，len必须严格大于(长度+1)*2，这是傅立叶变换所要求的
 		int len=1;
 		while (len<len1*2||len<len2*2) len<<=1;
 
