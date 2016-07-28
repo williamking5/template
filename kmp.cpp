@@ -18,8 +18,8 @@ public:
 		}
 	}
 	int kmp(char *x,char *y,int* ans){
-		strcat(s+1,x);
-		strcat(p+1,y);
+		strcpy(s+1,x);
+		strcpy(p+1,y);
 		getnext(p);
 		int sum=-1,i=0,j=0,n=strlen(s+1),m=strlen(p+1);
 		while (i<=n&&j<=m){
