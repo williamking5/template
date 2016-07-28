@@ -14,6 +14,7 @@ long long Extended_Euclid(long long a,long long b,long long &x,long long &y)    
     y-=a/b*x;
     return d;
 }
+//快速乘法，防止long long 乘long long
 long long cheng(long long a,long long b,long long mod){
     long long ans=0;
     while (b){
