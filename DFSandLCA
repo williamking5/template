@@ -1,0 +1,152 @@
+#include<iostream>
+#include<stdio.h>
+#include<string.h>
+#include<map>
+#include<math.h>
+#include<algorithm>
+#include<set>
+#include<vector>
+#define N 100000
+using namespace std;
+bool vis[N+10];
+int seq[N+10];
+long long fa[N+10][18],len[N+10][18];
+int dep[N+10];
+vector<long long> edge[N+10],w[N+10];
+int top=0;
+void dfs(int root,int h){
+    vis[root]=1;
+    dep[root]=h;
+    for (int i=0;i<edge[root].size();i++){
+        if (!vis[edge[root][i]]) {
+            fa[edge[root][i]][0]=root;
+            len[edge[root][i]][0]=w[root][i];
+            dfs(edge[root][i],h+1);
+        }
+    }
+    seq[root]=++top;
+}
+long long dis(int u,int v){
+    long long ans=0;
+    if (dep[u]<dep[v]) swap(u,v);
+    int tot,delta;
+    while (dep[u]>dep[v]){
+        delta=dep[u]-dep[v];
+        tot=-1;
+        while (delta){
+            tot++;
+            delta>>=1;
+        }
+        ans+=len[u][tot];
+        u=fa[u][tot];
+    }
+
+    while (u-v){
+        for (tot=17;tot>=0;tot--) if (fa[u][tot]-fa[v][tot]) break;
+        if (tot==-1) {
+            ans+=len[u][0]+len[v][0];
+            u=fa[u][0];
+            v=fa[v][0];
+        }
+        else {
+            ans+=len[u][tot]+len[v][tot];
+            u=fa[u][tot];
+            v=fa[v][tot];
+        }
+    }
+    return ans;
+}
+int MAP[N+10];
+set<int> SET;
+set<int>::iterator iter,tmp,iter1;
+int main(){
+    int n,m,x,y,wei;
+    scanf("%d%d",&n,&m);
+    for (int i=1;i<n;i++){
+        scanf("%d%d%d",&x,&y,&wei);
+        edge[x].push_back(y);
+        edge[y].push_back(x);
+        w[x].push_back(wei);
+        w[y].push_back(wei);
+    }
+
+    dfs(1,1);
+    for (int i=1;i<=n;i++)
+        MAP[seq[i]]=i;
+    int hh;
+    for (hh=0;1<<hh<=n;hh++);
+    for (int j=1;j<=hh;j++){
+        for (int i=1;i<=n;i++)
+            fa[i][j]=fa[fa[i][j-1]][j-1],len[i][j]=len[i][j-1]+len[fa[i][j-1]][j-1];
+    }
+
+    dis(4,7);
+    long long ans=0;
+    for (int i=0;i<m;i++){
+        scanf("%d",&x);
+        if (SET.find(seq[x])==SET.end()){
+            SET.insert(seq[x]);
+            iter=SET.find(seq[x]);
+            if (iter==SET.begin()){
+                tmp=iter;tmp++;
+                if (tmp==SET.end()){
+                    printf("%lld\n",ans);
+                }
+                else {
+                    iter1=SET.end();iter1--;
+                    ans+=dis(MAP[*iter1],MAP[*iter])+dis(MAP[*iter],MAP[*tmp]);
+                    ans-=dis(MAP[*iter1],MAP[*tmp]);
+                    printf("%lld\n",ans);
+                }
+            }
+            else {
+                tmp=iter;tmp++;
+                if (tmp==SET.end()){
+                    iter1=iter;iter1--;
+                    tmp=SET.begin();
+                    ans+=dis(MAP[*iter1],MAP[*iter])+dis(MAP[*iter],MAP[*tmp]);
+                    ans-=dis(MAP[*iter1],MAP[*tmp]);
+                    printf("%lld\n",ans);
+                }
+                else {
+                    tmp=iter;tmp--;
+                    iter1=iter;iter1++;
+                    ans+=dis(MAP[*tmp],MAP[*iter])+dis(MAP[*iter],MAP[*iter1]);
+                    ans-=dis(MAP[*tmp],MAP[*iter1]);
+                    printf("%lld\n",ans);
+                }
+            }
+        }
+        else {
+            iter=SET.find(seq[x]);
+            if (iter==SET.begin()){
+                iter1=iter;iter1++;
+                if (iter1==SET.end()){
+                    printf("%lld\n",ans);
+                }
+                else {
+                    tmp=SET.end();tmp--;
+                    ans=ans+dis(MAP[*tmp],MAP[*iter1])-dis(MAP[*tmp],MAP[*iter])-dis(MAP[*iter1],MAP[*iter]);
+                    printf("%lld\n",ans);
+                }
+            }
+            else {
+                iter1=iter;iter1++;
+                if (iter1==SET.end()){
+                    iter1=SET.begin();
+                    tmp=iter;tmp--;
+                    ans=ans+dis(MAP[*tmp],MAP[*iter1])-dis(MAP[*tmp],MAP[*iter])-dis(MAP[*iter],MAP[*iter1]);
+                    printf("%lld\n",ans);
+                }
+                else {
+                    tmp=iter;tmp--;
+                    ans=ans+dis(MAP[*tmp],MAP[*iter1])-dis(MAP[*tmp],MAP[*iter])-dis(MAP[*iter],MAP[*iter1]);
+                    printf("%lld\n",ans);
+                }
+            }
+
+            SET.erase(seq[x]);
+        }
+    }
+    return 0;
+}
