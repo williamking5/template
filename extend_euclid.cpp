@@ -15,16 +15,12 @@ long long gcd(long long a,long long b){
 }
 //求数论倒数（乘法逆元）
 long long reci(long long a,long long p){
-    if (gcd(a,p)-1) {
-        cout<<"NOT FOUND"<<endl;
-        return p+1;
-    }
     PC ret=extend_euclid(a,p);
     if (ret.first*p+ret.second*a==-1) {
         ret.first=-ret.first;
         ret.second=-ret.second;
     }
-    return ret.second;
+    return (ret.second%P+P)%P;
 }
 int main(){
     cout<<reci(2,7);
