@@ -136,6 +136,7 @@ struct TREAP{
 	int Remove(DATA data){
         return remove(root,root,data);
 	}
+	//查询有多少个数比x小
 	int rank(int &x,DATA data){
 		if (x==0) return 0;
 		if (tree[x].data<data) return tree[tree[x].left].size+rank(tree[x].right,data)+1;
