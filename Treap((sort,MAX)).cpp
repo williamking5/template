@@ -168,6 +168,8 @@ struct TREAP{
 	int Remove(DATA data){
         return remove(root,root,data);
 	}
+		
+	//查询排名第l到第r小的元素中，第二关键字的最大值，通常要引用rank函数才能实现按值查询
 	int FUN(int root,int l,int r){
         if (tree[root].size==r&&l==1) return tree[root].data.MAX;
         else {
