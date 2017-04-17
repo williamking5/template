@@ -19,7 +19,7 @@ long long cheng(long long a,long long b,long long mod){
     long long ans=0;
     while (b){
         ans+=(b&1)*a;
-        
+        ans%=mod;
         b/=2;
         a=(a*2)%mod;
     }
