@@ -8,27 +8,52 @@
 #include <map>
 #include <string>
 #include <stack>
+#include <float.h>
 #define d_num 2
-#define INF 1000000000000000000
+#define INF 9000000000000000000
 using namespace std;
 int currentd,root;
 struct node_class{
     int value[d_num];
     int split;
     int left,right,father;
-} node[100010];
+    int id;
+} node[100010],sequence[100010];
 bool cmp(node_class a,node_class b){
     return a.value[currentd]<b.value[currentd];
 }
-int build(int root,int l,int r,int d){
+bool cmp1(node_class a,node_class b){
+    return a.id<b.id;
+}
+double calVarience(int l,int r,int d){
+    double x2=0,xbar=0;
+    for (int i = l;i<=r;i++){
+        x2+=1LL*node[i].value[d]*node[i].value[d];
+        xbar+=node[i].value[d];
+    }
+    xbar/=(r-l+1);
+    return x2/(r-l+1)-xbar*xbar;
+}
+int build(int root,int l,int r){
     if (l>r) return 0;
+    double max=-1;
+    int d=0;
+    for (int i = 0;i<d_num;i++){
+        double tmpmax = calVarience(l,r,i);
+        if (tmpmax>max){
+            max = tmpmax;
+            d = i;
+        }
+    }
+
     currentd = d;
     sort(node+l,node+r+1,cmp);
     int mid = (l+r)>>1;
+    while (mid<r&&node[mid].value[d]==node[mid+1].value[d]) mid++;
     node[mid].split = d;
     node[mid].father = root;
-    node[mid].left = build(mid,l,mid-1,(d+1)%d_num);
-    node[mid].right = build(mid,mid+1,r,(d+1)%d_num);
+    node[mid].left = build(mid,l,mid-1);
+    node[mid].right = build(mid,mid+1,r);
     return mid;
 }
 long long calDistance(node_class a,node_class b){
@@ -51,11 +76,25 @@ struct stack_struct{
     }
 } searchStack;
 long long currentNear;
+int currentNode;
 void downSearch(int root,node_class t){
     if (!root) return ;
     int sonnode = 0, d = node[root].split;
     searchStack.push(root);
-    currentNear = min(currentNear,calDistance(node[root],t));
+    long long tmpdis = calDistance(node[root],t);
+    if (tmpdis>0) {
+        if (currentNear>tmpdis) {
+            currentNode = root;
+            currentNear = tmpdis;
+        }
+        else if (currentNear == tmpdis){
+            if (node[currentNode].value[0] >node[root].value[0]) {
+                currentNode = root;
+            }
+            else if (node[currentNode].value[0] ==node[root].value[0] && node[currentNode].value[1]>node[root].value[1])
+                currentNode = root; 
+        }
+    }
 
     if (node[root].value[d]>=t.value[d])
         sonnode = node[root].left;
@@ -80,32 +119,16 @@ void search(int root,node_class t){
         }
     }
 }
-void dfs(int root){
-    if (!root) return ;
-    cout<<root<<" "<<node[root].left<<" "<<node[root].right<<" "<<node[root].value[0]<<" "<<node[root].value[1]<<endl;
-    dfs(node[root].left);
-    dfs(node[root].right);
-}
 int main(){
-    int n,x,y;
-    scanf("%d",&n);
+    int n,m,x,y;
+    scanf("%d%d",&n,&m);
     for (int i = 1;i<=n;i++){
         scanf("%d%d",&node[i].value[0],&node[i].value[1]);
+        node[i].id = i;
     }
-    build(0,1,n,0);
-    root = (1+n)>>1;
+    int root = build(0,1,n);
+    search(root,node[1]);
+    cout<<currentNode<<endl;
 
-    node_class tofind;
-for (int i = 0;i<n;i++){
-        scanf("%d%d",&tofind.value[0],&tofind.value[1]);
-        search(root,tofind);
-        printf("%lld\n",currentNear);
-}
     return 0;
 }
-/*
-2
-8 6
-9 2
-6 3
-*/
