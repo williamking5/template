@@ -1,0 +1,131 @@
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <cassert>
+#include <vector>
+#include <set>
+using namespace std;
+
+#define maxn 120000
+#define maxnode 2200000
+#define maxlogv 16
+vector<int> G[maxn];
+int n,m;
+int a[maxn];
+
+int f[maxlogv+2][maxn];
+int dep[maxn];
+int ch[maxnode][2];
+int sz[maxnode];
+int tot;
+int root[maxn];
+
+int newnode(){
+    memset(ch[tot],0,sizeof(ch[tot]));
+    sz[tot]=0;
+    return tot++;
+}
+
+// insert val for x with father as y
+void insert(int x,int y,int val)
+{
+    x=root[x];y=root[y];
+    for(int i=15;i>=0;--i){
+        int c=(val>>i)&1;
+        if(!ch[x][c]){
+            int id=newnode();
+            ch[x][c]=id;
+            ch[x][!c]=ch[y][!c];
+            sz[ch[x][c]]=sz[ch[y][c]];
+        }
+        x=ch[x][c],y=ch[y][c];
+        ++sz[x];
+    }
+}
+
+void dfs(int u,int fa)
+{
+    f[0][u]=fa;dep[u]=dep[fa]+1;
+    root[u]=newnode();
+    insert(u,fa,a[u]);
+    for(int i=0;i<G[u].size();++i){
+        int v=G[u][i];
+        if(v==fa) continue;
+        dfs(v,u);
+    }
+}
+
+int lca(int u,int v)
+{
+    if(dep[u]>dep[v]) swap(u,v);
+    for(int k=0;k<maxlogv;++k){
+        if( (dep[v]-dep[u])>>k&1){
+            v=f[k][v];
+        }
+    }
+    if(u==v) return u;
+    for(int k=maxlogv-1;k>=0;--k){
+        if(f[k][u]!=f[k][v]){
+            u=f[k][u];
+            v=f[k][v];
+        }
+    }
+    return f[0][u];
+}
+
+int query(int x,int y,int val)
+{
+    int z=lca(x,y);int res=a[z]^val;
+    x=root[x],y=root[y],z=root[z];
+    int ret=0;
+    for(int i=15;i>=0;--i){
+        int c=(val>>i)&1;
+        if(sz[ch[x][!c]]+sz[ch[y][!c]]-2*sz[ch[z][!c]]>0){
+            ret+=1<<i;
+            c=!c;
+        }
+        x=ch[x][c];
+        y=ch[y][c];
+        z=ch[z][c];
+    }
+    return max(ret,res);
+}
+
+
+int main()
+{
+    while(cin>>n>>m){
+        for(int i=1;i<=n;++i){
+            scanf("%d",a+i);
+            G[i].clear();
+        }
+        int ui,vi;
+        for(int i=0;i<n-1;++i){
+            scanf("%d%d",&ui,&vi);
+            G[ui].push_back(vi);
+            G[vi].push_back(ui);
+        }
+        memset(root,0,sizeof(root));
+        tot=1;
+        memset(f,0,sizeof(f));
+        memset(sz,0,sizeof(sz));
+        dep[0]=0;
+        dfs(1,0);
+        for(int k=0;k+1<maxlogv;++k){
+            for(int v=1;v<=n;++v){
+                if(f[k][v]==0) f[k+1][v]=0;
+                else f[k+1][v]=f[k][f[k][v]];
+            }
+        }
+        int xi,yi,zi;
+        for(int i=0;i<m;++i){
+            scanf("%d%d%d",&xi,&yi,&zi);
+            printf("%d\n",query(xi,yi,zi));
+        }
+    }
+    return 0;
+}
